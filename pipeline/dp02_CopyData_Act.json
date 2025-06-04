@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "copyOrderFile",
+				"name": "copyInboundToOutbound",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -41,13 +41,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_dpInboundOrders",
+						"referenceName": "DS_SRC",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_dpOutboundOrders",
+						"referenceName": "DS_Sink",
 						"type": "DatasetReference"
 					}
 				]
