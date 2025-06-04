@@ -75,7 +75,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "SetFileName",
+							"name": "setFileName",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -92,11 +92,11 @@
 							}
 						},
 						{
-							"name": "SetFolderName",
+							"name": "setFolderName",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "SetFileName",
+									"activity": "setFileName",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -116,11 +116,11 @@
 							}
 						},
 						{
-							"name": "CopytoOutbound",
+							"name": "copytoOutbound",
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "SetFolderName",
+									"activity": "setFolderName",
 									"dependencyConditions": [
 										"Succeeded"
 									]
