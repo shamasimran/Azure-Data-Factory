@@ -1,0 +1,23 @@
+{
+	"name": "DS_dpOutboundOrders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_dpADLS",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ADLS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "orders_outbound.txt",
+				"folderPath": "outbound",
+				"fileSystem": "dpdevcontainer"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

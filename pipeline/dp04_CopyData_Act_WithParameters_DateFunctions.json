@@ -1,0 +1,184 @@
+{
+	"name": "dp04_CopyData_Act_WithParameters_DateFunctions",
+	"properties": {
+		"activities": [
+			{
+				"name": "getDayToProcess",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(toLower(pipeline().parameters.CurrentOrPreviousDay), 'previous')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "setFileFilterForPreviousDay",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "getDayToProcess",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FileFilter",
+					"value": {
+						"value": "@formatDateTime(addDays(utcNow(), -1) , 'ddMMyyyy')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "setFileFilterForCurrentDay",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "getDayToProcess",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FileFilter",
+					"value": {
+						"value": "@formatDateTime(utcNow(), 'ddMMyyyy')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "setFileName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "setFileFilterForPreviousDay",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "setFileFilterForCurrentDay",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FileName",
+					"value": {
+						"value": "@concat('Order_',variables('FileFilter'),'.txt')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "setFileName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false,
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SRC_WithParameters",
+						"type": "DatasetReference",
+						"parameters": {
+							"FolderName": {
+								"value": "@pipeline().parameters.FolderName",
+								"type": "Expression"
+							},
+							"FileName": {
+								"value": "@variables('FileName')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"FolderName": {
+				"type": "string",
+				"defaultValue": "inbound/Orders"
+			},
+			"CurrentOrPreviousDay": {
+				"type": "string",
+				"defaultValue": "Previous"
+			}
+		},
+		"variables": {
+			"FileName": {
+				"type": "String",
+				"defaultValue": "Order_"
+			},
+			"FileFilter": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "02_CoyData"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-04T00:08:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

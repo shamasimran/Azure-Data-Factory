@@ -1,0 +1,131 @@
+{
+	"name": "dp01_SetVariable_Act",
+	"properties": {
+		"activities": [
+			{
+				"name": "setName",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "personName",
+					"value": "Shamas"
+				}
+			},
+			{
+				"name": "setAge",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "setName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "personAge",
+					"value": 39
+				}
+			},
+			{
+				"name": "setGender",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "setAge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PersonGender",
+					"value": "Male"
+				}
+			},
+			{
+				"name": "setLocation",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "setGender",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "personLocation",
+					"value": "Lahore"
+				}
+			},
+			{
+				"name": "setOutput",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "setLocation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "outputMessage",
+					"value": {
+						"value": "@concat(\n'Person Name: ', variables('personName'),\n' , Age: ', string(variables('personAge')),\n' , Gender: ', variables('PersonGender'),\n', Location: ', variables('personLocation')\n\n)",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"personName": {
+				"type": "String"
+			},
+			"personAge": {
+				"type": "Integer"
+			},
+			"PersonGender": {
+				"type": "String"
+			},
+			"personLocation": {
+				"type": "String"
+			},
+			"outputMessage": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "01_SetVariable"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-02T00:04:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

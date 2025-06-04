@@ -1,0 +1,212 @@
+{
+	"name": "dp05_CopyData_Act_WildCards",
+	"properties": {
+		"activities": [
+			{
+				"name": "getProcessingOption",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [
+					{
+						"name": "PossibleValues_Option",
+						"value": "AllPreviousDayFiles, AllProductsFiles, StartWithFileOneExtraLetterAtEnd or StartWithFileTwoExtraLetterAtEnd"
+					}
+				],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().parameters.Option",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "AllPreviousDayFiles",
+							"activities": [
+								{
+									"name": "setFileName1",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FileName",
+										"value": {
+											"value": "@concat('*', formatDateTime(addDays(utcNow(), -1) , 'ddMMyyyy'), '.txt')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "AllProductsFiles",
+							"activities": [
+								{
+									"name": "setFileName2",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FileName",
+										"value": "products_*.txt"
+									}
+								}
+							]
+						},
+						{
+							"value": "StartWithFileOneExtraLetterAtEnd",
+							"activities": [
+								{
+									"name": "setFileName3",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FileName",
+										"value": "File?.txt"
+									}
+								}
+							]
+						},
+						{
+							"value": "StartWithFileTwoExtraLetterAtEnd",
+							"activities": [
+								{
+									"name": "setFileName4",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "FileName",
+										"value": "File??.txt"
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "SetFileName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FileName",
+								"value": "*.txt"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "CopyDatawithGivenChoice",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "getProcessingOption",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@pipeline().parameters.FolderName",
+								"type": "Expression"
+							},
+							"wildcardFileName": {
+								"value": "@variables('FileName')",
+								"type": "Expression"
+							},
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SRC_WithParameters",
+						"type": "DatasetReference",
+						"parameters": {
+							"FolderName": {
+								"value": "@pipeline().parameters.FolderName",
+								"type": "Expression"
+							},
+							"FileName": {
+								"value": "@variables('FileName')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Sink",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"FolderName": {
+				"type": "string",
+				"defaultValue": "inbound/dp05_CopyData_Act_WildCards"
+			},
+			"Option": {
+				"type": "string",
+				"defaultValue": "AllFiles"
+			}
+		},
+		"variables": {
+			"FileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "02_CoyData"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-04T00:08:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

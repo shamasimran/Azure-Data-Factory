@@ -1,0 +1,9 @@
+{
+	"name": "dpdfdemo",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "59fe3d47-2b18-4a8c-b47c-6751811a7cc0",
+		"tenantId": "d1be274c-a82d-4172-9047-c29dfa5e7784"
+	}
+}
