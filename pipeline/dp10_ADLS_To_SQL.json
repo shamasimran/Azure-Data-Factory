@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copydata",
+				"name": "copyInboundToSQL",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -16,13 +16,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "BinarySource",
+						"type": "DelimitedTextSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"recursive": true
+							"recursive": false,
+							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "BinaryReadSettings"
+							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -36,7 +37,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_SRC_WithParameters",
+						"referenceName": "DS_CSV_WithParemeters",
 						"type": "DatasetReference",
 						"parameters": {
 							"FolderName": "inbound",
@@ -48,6 +49,70 @@
 					{
 						"referenceName": "DS_SQL_Department",
 						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "copySQLToOutbound",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "copyInboundToSQL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_SQL_Department",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_CSV_WithParemeters",
+						"type": "DatasetReference",
+						"parameters": {
+							"FolderName": "outbound",
+							"FileName": "department.csv"
+						}
 					}
 				]
 			}
